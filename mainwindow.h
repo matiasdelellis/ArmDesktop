@@ -17,21 +17,17 @@ public:
     ~MainWindow();
 
 private slots:
-    void on_sliderElbow_sliderMoved(int position);
-
-    void on_sliderGripper_sliderMoved(int position);
-
-    void on_pushMotor_pressed();
-
-    void on_pushMotor_released();
-
-    void on_checkLighting_toggled(bool checked);
-
     void readSerial();
+
+    void onSerialPortError(QSerialPort::SerialPortError error);
 
     void on_sliderShoulder_valueChanged(int value);
 
     void on_dialBase_valueChanged(int value);
+
+    void on_sliderElbow_valueChanged(int value);
+
+    void on_sliderGripper_valueChanged(int value);
 
 private:
     Ui::MainWindow *ui;

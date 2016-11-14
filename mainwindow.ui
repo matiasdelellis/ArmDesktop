@@ -15,7 +15,7 @@
   </property>
   <property name="windowIcon">
    <iconset>
-    <normaloff>../../../Gambas/MeArmDesktop/builder.png</normaloff>../../../Gambas/MeArmDesktop/builder.png</iconset>
+    <normaloff>ArmDesktop.png</normaloff>ArmDesktop.png</iconset>
   </property>
   <property name="layoutDirection">
    <enum>Qt::LeftToRight</enum>
@@ -54,6 +54,9 @@
         </property>
         <property name="value">
          <number>90</number>
+        </property>
+        <property name="tracking">
+         <bool>false</bool>
         </property>
         <property name="orientation">
          <enum>Qt::Vertical</enum>
@@ -123,29 +126,11 @@
         <property name="value">
          <number>90</number>
         </property>
+        <property name="tracking">
+         <bool>false</bool>
+        </property>
         <property name="orientation">
          <enum>Qt::Vertical</enum>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </item>
-    <item row="2" column="1">
-     <layout class="QHBoxLayout" name="horizontalLayout">
-      <property name="sizeConstraint">
-       <enum>QLayout::SetMinimumSize</enum>
-      </property>
-      <item>
-       <widget class="QCheckBox" name="checkLighting">
-        <property name="text">
-         <string>General lighting</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="pushMotor">
-        <property name="text">
-         <string>Motor</string>
         </property>
        </widget>
       </item>

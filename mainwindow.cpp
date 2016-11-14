@@ -4,6 +4,9 @@
 #include <QSerialPortInfo>
 #include <QtWidgets>
 
+/*
+ * Main Window
+ */
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -30,15 +33,17 @@ MainWindow::MainWindow(QWidget *parent) :
     if (serialIsAvailable)
     {
         serial->setPortName(serialPortName);
-        serial->open(QSerialPort::WriteOnly);
         serial->setBaudRate(QSerialPort::Baud9600);
         serial->setDataBits(QSerialPort::Data8);
         serial->setParity(QSerialPort::NoParity);
         serial->setStopBits(QSerialPort::OneStop);
         serial->setFlowControl(QSerialPort::NoFlowControl);
+        serial->open(QSerialPort::ReadWrite);
 
         QObject::connect(serial, SIGNAL(readyRead()), this, SLOT(readSerial()));
+        QObject::connect(serial, SIGNAL(error(QSerialPort::SerialPortError)), this, SLOT(onSerialPortError(QSerialPort::SerialPortError)));
 
+        // Apply settings
         ui->statusBar->showMessage("Connected on " + serialPortName);
     }
     else
@@ -61,52 +66,45 @@ MainWindow::~MainWindow()
     delete serial;
 }
 
+/*
+ * Serial handlers.
+ */
 void MainWindow::readSerial()
 {
-    if (serial->canReadLine())
-        QByteArray bytes = serial->readAll();
+    if (serial->canReadLine()) {
+        QByteArray bytes = serial->readLine();
+        ui->statusBar->showMessage("Message: " + bytes);
 
-    //this->setDisabled(false);
+        this->setEnabled(true);
+    }
 }
 
-void MainWindow::on_sliderElbow_sliderMoved(int position)
+void MainWindow::onSerialPortError(QSerialPort::SerialPortError error)
 {
-    QString value = QString::number(position);
-    QByteArray valueArray = value.toLatin1();
+    static QSerialPort::SerialPortError previousError;
+
+    if (error != QSerialPort::NoError && error != previousError) {
+        previousError = error;
+        ui->statusBar->showMessage("Serial port error :" + QString::number(error) + ": " + serial->errorString());
+        if (serial->isOpen()) {
+            serial->close();
+            this->setDisabled(true);
+        }
+    }
+}
+
+/*
+ * Arm sliders
+ */
+void MainWindow::on_dialBase_valueChanged(int value)
+{
+    QString value2 = QString::number(value);
+    QByteArray valueArray = value2.toLatin1();
 
     this->setDisabled(true);
 
-    serial->write("E:");
+    serial->write("B");
     serial->write(valueArray);
-}
-
-void MainWindow::on_sliderGripper_sliderMoved(int position)
-{
-    QString value = QString::number(position);
-    QByteArray valueArray = value.toLatin1();
-
-    this->setDisabled(true);
-
-    serial->write("G:");
-    serial->write(valueArray);
-}
-
-void MainWindow::on_pushMotor_pressed()
-{
-    serial->write("M:1");
-}
-
-void MainWindow::on_pushMotor_released()
-{
-    serial->write("M:0");
-}
-
-void MainWindow::on_checkLighting_toggled(bool checked)
-{
-    if (checked == true)
-        serial->write("L:1");
-    else
-        serial->write("L:0");
 }
 
 void MainWindow::on_sliderShoulder_valueChanged(int value)
@@ -114,19 +112,30 @@ void MainWindow::on_sliderShoulder_valueChanged(int value)
     QString value2 = QString::number(value);
     QByteArray valueArray = value2.toLatin1();
 
-    //this->setDisabled(true);
+    this->setDisabled(true);
 
     serial->write("S");
     serial->write(valueArray);
 }
 
-void MainWindow::on_dialBase_valueChanged(int value)
+void MainWindow::on_sliderElbow_valueChanged(int value)
 {
     QString value2 = QString::number(value);
     QByteArray valueArray = value2.toLatin1();
 
-    //this->setDisabled(true);
+    this->setDisabled(true);
 
-    serial->write("B");
+    serial->write("E");
+    serial->write(valueArray);
+}
+
+void MainWindow::on_sliderGripper_valueChanged(int value)
+{
+    QString value2 = QString::number(value);
+    QByteArray valueArray = value2.toLatin1();
+
+    this->setDisabled(true);
+
+    serial->write("G");
     serial->write(valueArray);
 }
